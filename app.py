@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import random
-import plotly.express as px
+
 
 # Function to generate example data
 def generate_example_data(num_entries=10):
