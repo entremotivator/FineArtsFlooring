@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import random
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Function to generate example data
 def generate_example_data(num_entries=10):
@@ -11,7 +12,9 @@ def generate_example_data(num_entries=10):
         'Brightness': [random.randint(0, 100) for _ in range(num_entries)],
         'Temperature': [random.uniform(18.0, 30.0) for _ in range(num_entries)],
         'Motion Detected': [random.choice([True, False]) for _ in range(num_entries)],
-        'Command': [''] * num_entries
+        'Command': [''] * num_entries,
+        'Security Level': [random.randint(1, 5) for _ in range(num_entries)],
+        'Smoke Detected': [random.choice([True, False]) for _ in range(num_entries)],
     })
 
 # Title
@@ -32,12 +35,16 @@ if navigation_option == "LED Lights":
     st.write(f"Command Sent: Adjust brightness of {selected_room} to {brightness_slider}")
 
     # Real-time Brightness Visualization
-    fig_brightness = px.bar(led_data, x='Room', y='Brightness', color='Status', title='Real-time Brightness Status')
-    st.plotly_chart(fig_brightness)
+    fig_brightness, ax = plt.subplots()
+    sns.barplot(x='Room', y='Brightness', hue='Status', data=led_data, ax=ax)
+    ax.set_title('Real-time Brightness Status')
+    st.pyplot(fig_brightness)
 
     # Real-time Motion Detection Visualization
-    fig_motion = px.bar(led_data, x='Room', y='Motion Detected', color='Status', title='Motion Detection Status')
-    st.plotly_chart(fig_motion)
+    fig_motion, ax = plt.subplots()
+    sns.barplot(x='Room', y='Motion Detected', hue='Status', data=led_data, ax=ax)
+    ax.set_title('Motion Detection Status')
+    st.pyplot(fig_motion)
 
 # Voice Control Section
 elif navigation_option == "Voice Control":
@@ -57,13 +64,21 @@ elif navigation_option == "Smoke Monitor":
     st.dataframe(smoke_data)
 
     # Real-time Temperature Visualization
-    fig_temperature = px.line(smoke_data, x='Room', y='Temperature', title='Real-time Temperature Status')
-    st.plotly_chart(fig_temperature)
+    fig_temperature, ax = plt.subplots()
+    sns.lineplot(x='Room', y='Temperature', data=smoke_data, ax=ax)
+    ax.set_title('Real-time Temperature Status')
+    st.pyplot(fig_temperature)
 
     # Notifications
     high_temp_rooms = smoke_data.loc[smoke_data['Temperature'] > 25, 'Room'].tolist()
     if high_temp_rooms:
         st.warning(f"High temperature detected in {', '.join(high_temp_rooms)}!")
+
+    # Smoke Detection Status
+    fig_smoke, ax = plt.subplots()
+    sns.barplot(x='Room', y='Smoke Detected', hue='Status', data=smoke_data, ax=ax)
+    ax.set_title('Smoke Detection Status')
+    st.pyplot(fig_smoke)
 
 # Alarm System Section
 elif navigation_option == "Alarm System":
@@ -87,6 +102,14 @@ elif navigation_option == "Settings":
     # Enable/Disable Notifications
     enable_notifications = st.checkbox("Enable Notifications", value=True)
     st.write(f"Notifications {'Enabled' if enable_notifications else 'Disabled'}")
+
+    # Security Level Adjustment
+    security_level_data = generate_example_data()
+    st.dataframe(security_level_data)
+
+    selected_security_room = st.selectbox("Select Room:", security_level_data['Room'])
+    security_level_slider = st.slider("Adjust Security Level:", 1, 5, security_level_data.loc[security_level_data['Room'] == selected_security_room, 'Security Level'].values[0])
+    st.write(f"Security Level for {selected_security_room} set to {security_level_slider}")
 
     # Other settings...
 
