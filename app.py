@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import random
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Function to generate example data
@@ -17,12 +16,9 @@ def generate_example_data(num_entries=10):
         'Smoke Detected': [random.choice([True, False]) for _ in range(num_entries)],
     })
 
-# Set Matplotlib backend
-import matplotlib
-matplotlib.use("Agg")
-
-# Title
+# Title and Subtitle
 st.title("Fine Arts Flooring Smart Home Control")
+st.subheader("Explore and Control Your Smart Home")
 
 # Sidebar for Navigation
 navigation_option = st.sidebar.radio("Navigation", ["LED Lights", "Voice Control", "Smoke Monitor", "Alarm System", "Settings"])
@@ -39,16 +35,12 @@ if navigation_option == "LED Lights":
     st.write(f"Command Sent: Adjust brightness of {selected_room} to {brightness_slider}")
 
     # Real-time Brightness Visualization
-    fig_brightness, ax = plt.subplots()
-    sns.barplot(x='Room', y='Brightness', hue='Status', data=led_data, ax=ax)
-    ax.set_title('Real-time Brightness Status')
-    st.pyplot(fig_brightness)
+    st.subheader("Real-time Brightness Status")
+    st.bar_chart(led_data[led_data['Room'] == selected_room][['Status', 'Brightness']])
 
     # Real-time Motion Detection Visualization
-    fig_motion, ax = plt.subplots()
-    sns.barplot(x='Room', y='Motion Detected', hue='Status', data=led_data, ax=ax)
-    ax.set_title('Motion Detection Status')
-    st.pyplot(fig_motion)
+    st.subheader("Motion Detection Status")
+    st.bar_chart(led_data[led_data['Room'] == selected_room][['Status', 'Motion Detected']])
 
 # Voice Control Section
 elif navigation_option == "Voice Control":
@@ -68,10 +60,8 @@ elif navigation_option == "Smoke Monitor":
     st.dataframe(smoke_data)
 
     # Real-time Temperature Visualization
-    fig_temperature, ax = plt.subplots()
-    sns.lineplot(x='Room', y='Temperature', data=smoke_data, ax=ax)
-    ax.set_title('Real-time Temperature Status')
-    st.pyplot(fig_temperature)
+    st.subheader("Real-time Temperature Status")
+    st.line_chart(smoke_data[['Room', 'Temperature']].set_index('Room'))
 
     # Notifications
     high_temp_rooms = smoke_data.loc[smoke_data['Temperature'] > 25, 'Room'].tolist()
@@ -79,10 +69,8 @@ elif navigation_option == "Smoke Monitor":
         st.warning(f"High temperature detected in {', '.join(high_temp_rooms)}!")
 
     # Smoke Detection Status
-    fig_smoke, ax = plt.subplots()
-    sns.barplot(x='Room', y='Smoke Detected', hue='Status', data=smoke_data, ax=ax)
-    ax.set_title('Smoke Detection Status')
-    st.pyplot(fig_smoke)
+    st.subheader("Smoke Detection Status")
+    st.bar_chart(smoke_data[['Room', 'Smoke Detected', 'Status']].set_index('Room'))
 
 # Alarm System Section
 elif navigation_option == "Alarm System":
