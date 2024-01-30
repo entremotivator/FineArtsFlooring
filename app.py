@@ -17,6 +17,10 @@ def generate_example_data(num_entries=10):
         'Smoke Detected': [random.choice([True, False]) for _ in range(num_entries)],
     })
 
+# Set Matplotlib backend
+import matplotlib
+matplotlib.use("Agg")
+
 # Title
 st.title("Fine Arts Flooring Smart Home Control")
 
